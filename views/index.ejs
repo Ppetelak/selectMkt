@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Você foi convidado! - Select Operadora de Planos de Saúde</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <form id="guestForm">
+            <div class="form-group">
+                <label for="cpf">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" required>
+                <span id="cpfError" class="text-danger" style="display: none;">CPF inválido!</span>
+            </div>
+            <div class="form-group">
+                <label for="nomeCompleto">Nome Completo</label>
+                <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="text" class="form-control" id="telefone" name="telefone" required>
+            </div>
+            <div class="form-group">
+                <label for="profissao">Profissão</label>
+                <select class="form-control" id="profissao" name="profissao" required>
+                    <option value="Corretor">Corretor</option>
+                    <option value="Dono de Corretora">Dono(a) de corretora</option>
+                    <option value="Dono de Laboratório">Dono(a) de Laboratório</option>
+                    <option value="Dono de Hospital">Dono(a) de Hospital</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="vaiLevarConvidado">Vai levar um convidado?</label>
+                <select class="form-control" id="vaiLevarConvidado" name="vaiLevarConvidado" required>
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                </select>
+            </div>
+            <div id="convidadoExtra" style="display: none;">
+                <h3>Dados do Convidado Extra</h3>
+                <div class="form-group">
+                    <label for="cpfConvidado">CPF</label>
+                    <input type="text" class="form-control" id="cpfConvidado" name="cpfConvidado">
+                    <span id="cpfConvidadoError" class="text-danger" style="display: none;">CPF inválido!</span>
+                </div>
+                <div class="form-group">
+                    <label for="nomeCompletoConvidado">Nome Completo</label>
+                    <input type="text" class="form-control" id="nomeCompletoConvidado" name="nomeCompletoConvidado">
+                </div>
+                <div class="form-group">
+                    <label for="emailConvidado">Email</label>
+                    <input type="email" class="form-control" id="emailConvidado" name="emailConvidado">
+                </div>
+                <div class="form-group">
+                    <label for="telefoneConvidado">Telefone</label>
+                    <input type="text" class="form-control" id="telefoneConvidado" name="telefoneConvidado">
+                </div>
+                <div class="form-group">
+                    <label for="profissaoConvidado">Profissão</label>
+                    <select class="form-control" id="profissaoConvidado" name="profissaoConvidado">
+                        <option value="Corretor">Corretor</option>
+                        <option value="Dono de Corretora">Dono(a) de corretora</option>
+                        <option value="Dono de Laboratório">Dono(a) de Laboratório</option>
+                        <option value="Dono de Hospital">Dono(a) de Hospital</option>
+                    </select>
+                </div>
+            </div>
+            <input type="hidden" id="tipoConvite" name="tipoConvite" value="pista"><!-- Este valor deve ser ajustado conforme a página -->
+            <button type="submit" class="btn btn-primary" id="submitBtn">Enviar</button>
+        </form>
+    </div>
+
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel">Ops 😥 Algo não saiu bem ...</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="errorMessage">
+                    <!-- Mensagem de erro será inserida aqui -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
