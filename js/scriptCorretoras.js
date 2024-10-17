@@ -58,55 +58,29 @@ $(document).ready(function() {
     }
 
     $('#guestForm').submit(function(e) {
-        console.log('Entrou aqui no submit de envio do formulário')
-		$('#submitBtn').prop('disabled', true);
+        console.log('Entrou aqui no submit de envio do formulário');
+        $('#submitBtn').prop('disabled', true);
         $('#loadingSpinner').show();
         e.preventDefault();
         const formData = $(this).serialize();
-    
-        $.post(`${link}/submit-form`, formData)
+        
+        // Obter o parâmetro da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const parametro = urlParams.get('empresa');
+        console.log(parametro);
+        $.post(`${link}/submit-form-corretoras?parametro=${parametro}`, formData)
             .done(function(response) {
                 window.location.href = `https://selectoperadora.com.br/eventos/confirmacao/?numeroConviteAnfitriao=${response.numeroConviteAnfitriao}&numeroConviteConvidado=${response.numeroConviteConvidado || ''}&tipoConvite=${response.tipoConvite}&cpf=${response.cpf}&nomeCompleto=${response.nomeCompleto}&cpfConvidado=${response.cpfConvidado}&nomeCompletoConvidado=${response.nomeCompletoConvidado}`;
             })
             .fail(function(jqXHR) {
-                // Exibe o modal com a mensagem de erro
                 const errorMessage = jqXHR.responseJSON.message || 'Ocorreu um erro desconhecido.';
                 $('#errorMessage').text(errorMessage);
                 $('#errorModal').modal('show');
             })
-			.always(function() {
-				$('#submitBtn').prop('disabled', false);
-				$('#loadingSpinner').hide();
-			});
-    });
-    
-    function carregarEmpresas() {
-        $.get(`${link}/api/empresas`, function(data) {
-            const $profissaoSelect = $('#empresa');
-            $profissaoSelect.empty();
-            data.forEach(function(empresa) {
-                if (empresa.tipoEmpresa === 'outros') { // Verifica se o tipoEmpresa é 'outros'
-                    $profissaoSelect.append(`<option value="${empresa.id}" data-vip="${empresa.convites_vip}" data-pista="${empresa.convites_pista}">${empresa.nome}</option>`);
-                }
+            .always(function() {
+                $('#submitBtn').prop('disabled', false);
+                $('#loadingSpinner').hide();
             });
-            atualizarConvites(); // Atualiza os campos ocultos quando as empresas são carregadas
-        });
-    }
-
-    // Função para atualizar os inputs escondidos
-    function atualizarConvites() {
-        const empresaSelecionada = $('#profissao').find('option:selected');
-        const convitesVIP = empresaSelecionada.data('vip');
-        const convitesPista = empresaSelecionada.data('pista');
-
-        $('#convitesVIP').val(convitesVIP);
-        $('#convitesPista').val(convitesPista);
-    }
-
-    // Carrega as empresas ao carregar a página
-    carregarEmpresas();
-
-    // Atualiza os inputs escondidos quando o usuário seleciona uma empresa
-    $('#profissao').change(atualizarConvites);
+    });
     
 });

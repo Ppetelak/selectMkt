@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    /* Estilização dos labels */
+form label {
+    color: #212B33;
+}
+
+/* Estilização dos inputs, selects, textarea e o campo de upload */
+form input[type="text"],
+form input[type="email"],
+form input[type="tel"],
+form input[type="file"],
+form select,
+form textarea {
+    background-color: #dadada;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: #212B33; /* Cor do texto nos inputs */
+}
+
+/* Estilização do botão de enviar */
+form button[type="submit"] {
+    background-color: #BDE521;
+    color: #212B33;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Efeito hover no botão */
+form button[type="submit"]:hover {
+    background-color: #d4e865;
+    color: #212B33;
+}
+
+</style>
+<body>
+    <div class="container mt-5">
+        <form id="prestador-form" method="POST" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="cpf_cnpj" class="form-label">CNPJ / CPF</label>
+                    <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="telefone" class="form-label">Telefone</label>
+                    <input type="tel" class="form-control" id="telefone" name="telefone" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="celular" class="form-label">Celular</label>
+                    <input type="tel" class="form-control" id="celular" name="celular" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="whatsapp" class="form-label">WhatsApp</label>
+                    <input type="tel" class="form-control" id="whatsapp" name="whatsapp" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="endereco" class="form-label">Endereço</label>
+                    <input type="text" class="form-control" id="endereco" name="endereco" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <label for="numero" class="form-label">Número</label>
+                    <input type="text" class="form-control" id="numero" name="numero" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="bairro" class="form-label">Bairro</label>
+                    <input type="text" class="form-control" id="bairro" name="bairro" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="cidade" class="form-label">Cidade</label>
+                    <input type="text" class="form-control" id="cidade" name="cidade" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="uf" class="form-label">UF</label>
+                    <select class="form-select" id="uf" name="uf" required>
+                        <option selected disabled>Selecione</option>
+                        <option value="AC">Acre</option>
+                        <option value="AL">Alagoas</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="AP">Amapá</option>
+                        <option value="BA">Bahia</option>
+                        <option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option>
+                        <option value="ES">Espírito Santo</option>
+                        <option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="MS">Mato Grosso do Sul</option>
+                        <option value="MT">Mato Grosso</option>
+                        <option value="PA">Pará</option>
+                        <option value="PB">Paraíba</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="PI">Piauí</option>
+                        <option value="PR">Paraná</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="RN">Rio Grande do Norte</option>
+                        <option value="RO">Rondônia</option>
+                        <option value="RR">Roraima</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="SE">Sergipe</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="TO">Tocantins</option>
+                    </select>
+                </div>                
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label for="tipo_prestador" class="form-label">Tipo de Prestador</label>
+                    <select class="form-select" id="tipo_prestador" name="tipo_prestador" required>
+                        <option selected disabled>Selecione</option>
+                        <option value="associacao_medica">Associação Médica</option>
+                        <option value="consultorio_medico">Consultório Médico</option>
+                        <option value="clinica">Clínica</option>
+                        <option value="cooperativa">Cooperativa</option>
+                        <option value="fornecedor">Fornecedor</option>
+                        <option value="home_care">Home Care</option>
+                        <option value="hospital_dia">Hospital Dia</option>
+                        <option value="hospital_especializado">Hospital Especializado</option>
+                        <option value="hospital_geral">Hospital Geral</option>
+                        <option value="laboratorio">Laboratório</option>
+                        <option value="maternidade">Maternidade</option>
+                        <option value="policlinica">Policlínica</option>
+                        <option value="pronto_socorro">Pronto Socorro</option>
+                        <option value="pronto_socorro_especializado">Pronto Socorro Especializado</option>
+                        <option value="remocao">Remoção</option>
+                        <option value="servico_imagem">Serviço de Imagem</option>
+                        <option value="telessaude">Telessaúde</option>
+                        <option value="terapias_nao_medicas">Terapias Não Médicas</option>
+                    </select>                    
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="especialidades" class="form-label">Especialidades / Serviços realizados</label>
+                <textarea class="form-control" id="especialidades" name="especialidades" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="apresentacao" class="form-label">Comentário</label>
+                <textarea class="form-control" id="apresentacao" name="apresentacao" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="anexo" class="form-label">Envio de Anexos</label>
+                <input type="file" class="form-control" id="anexo" name="anexo" multiple required>
+                <small class="text-danger" id="file-warning">
+                    Permitido apenas arquivos PDF com tamanho máximo somado de 25 MB.
+                </small>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Enviar</button>
+            <p id="sending-message" style="display: none; color: red;">Enviando... Aguarde</p>
+        </form>
+        <div id="response-message" class="mt-3"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+    const fileInput = document.getElementById('anexo');
+    const fileWarning = document.getElementById('file-warning');
+
+    // Limite de tamanho para Gmail (em bytes, 25MB)
+    const maxFileSize = 25 * 1024 * 1024; // 25 MB
+
+    // Evento de mudança no campo de arquivos
+    fileInput.addEventListener('change', function() {
+        let valid = true;
+        let totalSize = 0;
+        const files = fileInput.files;
+        fileWarning.style.display = 'none'; // Esconde a mensagem inicialmente
+
+        // Verificar cada arquivo
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // Verificar o tipo do arquivo
+            if (file.type !== 'application/pdf') {
+                valid = false;
+                fileWarning.textContent = "Apenas arquivos PDF são permitidos.";
+                fileWarning.style.display = 'block';
+                break;
+            }
+
+            // Somar o tamanho total dos arquivos
+            totalSize += file.size;
+            if (totalSize > maxFileSize) {
+                valid = false;
+                fileWarning.textContent = "O tamanho total dos arquivos não pode exceder 25 MB.";
+                fileWarning.style.display = 'block';
+                break;
+            }
+        }
+
+        // Se os arquivos não forem válidos, limpar o input
+        if (!valid) {
+            fileInput.value = ''; // Limpar o campo de arquivos
+        }
+    });
+
+    document.getElementById('prestador-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Evita o envio tradicional do formulário
+
+    var form = document.getElementById('prestador-form');
+    var formData = new FormData(form);
+    var responseMessage = document.getElementById('response-message');
+    var submitBtn = document.getElementById('submit-btn');
+    var sendingMessage = document.getElementById('sending-message');
+    /* var url = 'https://selectoperadora.com.br/envioemail-credenciados/envio-email.php' */
+    var url = 'http://localhost:9898/send-email';
+
+    // Desativar o botão e mostrar a mensagem
+    submitBtn.disabled = true;
+    sendingMessage.style.display = 'block';
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())  // Obtém a resposta como texto
+    .then(text => {
+        try {
+            // Tente converter o texto em JSON
+            var data = JSON.parse(text);
+            if (data.success) {
+                responseMessage.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                form.reset(); // Limpar o formulário após o envio com sucesso
+            } else {
+                responseMessage.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
+            }
+        } catch (error) {
+            // Se a conversão falhar, mostre o texto bruto
+            responseMessage.innerHTML = '<div class="alert alert-danger">Resposta inesperada do servidor tente novamente:  ' + text + ' </div>';
+            console.error('Erro ao processar JSON:', error, text);
+        }
+    })
+    .catch(error => {
+        responseMessage.innerHTML = '<div class="alert alert-danger">Ocorreu um erro ao enviar o formulário. Tente novamente.</div>';
+        console.log(JSON.stringify(error.message));
+    })
+    .finally(() => {
+        // Reativar o botão e esconder a mensagem
+        submitBtn.disabled = false;
+        sendingMessage.style.display = 'none';
+    });
+});
+
+</script>
+</html>

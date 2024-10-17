@@ -1,54 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Você foi convidado! - Select Operadora de Planos de Saúde</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div id="confirmation">
-        <img src="https://selectoperadora.com.br/wp-content/uploads/2024/08/Camada_1-1.png" alt="Logo" class="logo">
-        <h1>Confirmação do Evento</h1>
-        <p id="numeroConviteAnfitriao"></p>
-        <p id="numeroConviteConvidado"></p>
-        <p id="tipoConvite"></p>
-        <p id="cpf"></p>
-        <p id="nomeCompleto"></p>
-        <p id="cpfConvidado"></p>
-        <p id="nomeCompletoConvidado"></p>
-        <button id="printButton" onclick="window.print()">Imprimir</button>
-    </div>
+<div id="confirmation">
+    <img src="https://selectoperadora.com.br/wp-content/uploads/2024/08/Camada_1-1.png" alt="Logo" class="logo">
+    <h1>Convite(s)</h1>
+    <div id="tipoConvite"></div>
+    </br>
+    <div id="numeroConviteAnfitriao"></div>
+    <div id="cpf"></div>
+    <div id="nomeCompleto"></div>
+    </br>
+    </br>
+    <div id="divisor"></div>
+    <div id="numeroConviteConvidado"></div>
+    <div id="cpfConvidado"></div>
+    <div id="nomeCompletoConvidado"></div>
+    <button id="printButton" onclick="window.print()">Imprimir</button>
+</div>
 
-    <script>
-        // Função para obter os parâmetros da URL
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                numeroConviteAnfitriao: params.get('numeroConviteAnfitriao'),
-                numeroConviteConvidado: params.get('numeroConviteConvidado'),
-                tipoConvite: params.get('tipoConvite'),
-                cpf: params.get('cpf'),
-                nomeCompleto: params.get('nomeCompleto'),
-                cpfConvidado: params.get('cpfConvidado'),
-                nomeCompletoConvidado: params.get('nomeCompletoConvidado')
-            };
+<script>
+    // Função para obter os parâmetros da URL
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            numeroConviteAnfitriao: params.get('numeroConviteAnfitriao'),
+            numeroConviteConvidado: params.get('numeroConviteConvidado'),
+            tipoConvite: params.get('tipoConvite'),
+            cpf: params.get('cpf'),
+            nomeCompleto: params.get('nomeCompleto'),
+            cpfConvidado: params.get('cpfConvidado'),
+            nomeCompletoConvidado: params.get('nomeCompletoConvidado')
+        };
+    }
+
+    // Função para exibir os parâmetros na página
+    function displayConfirmationInfo() {
+        const params = getQueryParams();
+        document.getElementById('numeroConviteAnfitriao').innerHTML = `<strong>Número do Convite:</strong> ${params.numeroConviteAnfitriao}`;
+        document.getElementById('tipoConvite').innerHTML = `<strong>Tipo de Convite: </strong> ${params.tipoConvite}`;
+        document.getElementById('cpf').innerHTML = `<strong>CPF: </strong> ${params.cpf}`;
+        document.getElementById('nomeCompleto').innerHTML = `<strong> Nome Completo: </strong> ${params.nomeCompleto}`;
+        if (params.numeroConviteConvidado !== null){
+            document.getElementById('numeroConviteConvidado').innerHTML = `<strong>Número do Convite do Convidado:</strong> ${params.numeroConviteConvidado}`;
+            document.getElementById('nomeCompletoConvidado').innerHTML = ` <strong> Nome Completo do Convidado: </strong> ${params.nomeCompletoConvidado}`;
+            document.getElementById('cpfConvidado').innerHTML = `<strong> CPF do Convidado: </strong> ${params.cpfConvidado}`;
         }
+    }
 
-        // Função para exibir os parâmetros na página
-        function displayConfirmationInfo() {
-            const params = getQueryParams();
-            document.getElementById('numeroConviteAnfitriao').innerText = `Número do Convite do Anfitrião: ${params.numeroConviteAnfitriao}`;
-            document.getElementById('numeroConviteConvidado').innerText = `Número do Convite do Convidado: ${params.numeroConviteConvidado}`;
-            document.getElementById('tipoConvite').innerText = `Tipo de Convite: ${params.tipoConvite}`;
-            document.getElementById('cpf').innerText = `CPF: ${params.cpf}`;
-            document.getElementById('nomeCompleto').innerText = `Nome Completo: ${params.nomeCompleto}`;
-            document.getElementById('cpfConvidado').innerText = `CPF do Convidado: ${params.cpfConvidado}`;
-            document.getElementById('nomeCompletoConvidado').innerText = `Nome Completo do Convidado: ${params.nomeCompletoConvidado}`;
-        }
-
-        // Chama a função para exibir as informações assim que a página carrega
-        window.onload = displayConfirmationInfo;
-    </script>
-</body>
-</html>
+    // Chama a função para exibir as informações assim que a página carrega
+    window.onload = displayConfirmationInfo;
+</script>

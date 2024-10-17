@@ -42,19 +42,9 @@ $(document).ready(function() {
         toggleSubmitButton();
     });
 
-    $('#vaiLevarConvidado').change(function() {
-        if ($(this).val() === 'sim') {
-            $('#convidadoExtra').show();
-        } else {
-            $('#convidadoExtra').hide();
-        }
-        toggleSubmitButton();
-    });
-
     function toggleSubmitButton() {
         const isCPFValid = checkCPF('cpf', 'cpfError');
-        const isConvidadoCPFValid = $('#vaiLevarConvidado').val() === 'sim' ? checkCPF('cpfConvidado', 'cpfConvidadoError') : true;
-        $('#submitBtn').prop('disabled', !(isCPFValid && isConvidadoCPFValid));
+        $('#submitBtn').prop('disabled', !(isCPFValid));
     }
 
     $('#guestForm').submit(function(e) {
@@ -64,7 +54,7 @@ $(document).ready(function() {
         e.preventDefault();
         const formData = $(this).serialize();
     
-        $.post(`${link}/submit-form`, formData)
+        $.post(`${link}/submit-form-select-salvador`, formData)
             .done(function(response) {
                 window.location.href = `https://selectoperadora.com.br/eventos/confirmacao/?numeroConviteAnfitriao=${response.numeroConviteAnfitriao}&numeroConviteConvidado=${response.numeroConviteConvidado || ''}&tipoConvite=${response.tipoConvite}&cpf=${response.cpf}&nomeCompleto=${response.nomeCompleto}&cpfConvidado=${response.cpfConvidado}&nomeCompletoConvidado=${response.nomeCompletoConvidado}`;
             })
@@ -79,34 +69,5 @@ $(document).ready(function() {
 				$('#loadingSpinner').hide();
 			});
     });
-    
-    function carregarEmpresas() {
-        $.get(`${link}/api/empresas`, function(data) {
-            const $profissaoSelect = $('#empresa');
-            $profissaoSelect.empty();
-            data.forEach(function(empresa) {
-                if (empresa.tipoEmpresa === 'outros') { // Verifica se o tipoEmpresa é 'outros'
-                    $profissaoSelect.append(`<option value="${empresa.id}" data-vip="${empresa.convites_vip}" data-pista="${empresa.convites_pista}">${empresa.nome}</option>`);
-                }
-            });
-            atualizarConvites(); // Atualiza os campos ocultos quando as empresas são carregadas
-        });
-    }
-
-    // Função para atualizar os inputs escondidos
-    function atualizarConvites() {
-        const empresaSelecionada = $('#profissao').find('option:selected');
-        const convitesVIP = empresaSelecionada.data('vip');
-        const convitesPista = empresaSelecionada.data('pista');
-
-        $('#convitesVIP').val(convitesVIP);
-        $('#convitesPista').val(convitesPista);
-    }
-
-    // Carrega as empresas ao carregar a página
-    carregarEmpresas();
-
-    // Atualiza os inputs escondidos quando o usuário seleciona uma empresa
-    $('#profissao').change(atualizarConvites);
     
 });
