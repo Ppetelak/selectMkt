@@ -2,7 +2,7 @@ console.log('Entrou aqui')
 let linkProd = 'https://select.midiaideal.net';
 let linkDev = 'http://localhost:9898';
 
-let link = linkDev;
+let link = linkProd;
 
 function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]+/g, '');
