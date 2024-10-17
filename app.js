@@ -35,39 +35,7 @@ app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
 app.use(cookie());
 app.use(express.json());
-app.use((err, req, res, next) => {
-    // Registrar o erro usando o Winston
-    logger.error({
-        message: err.message,
-        stack: err.stack,
-        url: req.originalUrl,
-        method: req.method,
-        body: req.body,
-        params: req.params,
-        query: req.query,
-    });
 
-    // Responder ao cliente com um status 500 e uma mensagem de erro genérica
-    res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    logger.error({
-        message: 'Unhandled Rejection at Promise',
-        reason: reason,
-        promise: promise,
-    });
-});
-
-process.on('uncaughtException', (error) => {
-    logger.error({
-        message: 'Uncaught Exception',
-        stack: error.stack,
-    });
-
-    // Opcional: terminar o processo para evitar um estado inconsistente
-    process.exit(1);
-});
 
 
 
@@ -117,54 +85,47 @@ app.use(
 
 const discordWebhookUrl = 'https://discord.com/api/webhooks/1296523170911879249/iiaZa4nUaKbcVLTsWW_eVfHqdrmov_1Insyo-jVAqw8A7e4adDpwfjun9mHkMt5XTS9W';
 
+class DiscordTransport extends winston.transports.Console {
+    log(info, callback) {
+        setImmediate(() => this.emit('logged', info));
+
+        if (info.level === 'error') {
+            // Montar mensagem para o Discord
+            const discordMessage = {
+                username: 'Error MKT Select App', // Nome do bot no Discord
+                content: `🚨 **ERRO DETECTADO**\n**Timestamp**: ${info.timestamp}\n**Mensagem**: ${info.message}\n${info.stack ? `**Stacktrace**: \`\`\`${info.stack}\`\`\`` : ''}`
+            };
+
+            // Enviar mensagem para o Discord
+            axios.post(discordWebhookUrl, discordMessage).catch(error => {
+                console.error('Erro ao enviar notificação para o Discord:', error);
+            });
+        }
+
+        callback();
+    }
+}
+
 const logger = winston.createLogger({
     level: "error",
     format: winston.format.combine(
         winston.format.timestamp(),
+        winston.format.errors({ stack: true }), // Para incluir stacktrace no log
         winston.format.json()
     ),
     transports: [
+        // Registrar o erro em um arquivo de log
         new winston.transports.File({
             filename: path.join("erros", "error.log.json"),
         }),
-        // Transporte customizado para enviar notificações de erro ao Discord
-        new winston.transports.Console({
-            format: winston.format.printf(({ level, message, timestamp, stack }) => {
-                // Chave de Webhook do Discord (substitua pela sua URL de webhook)
-
-                // Montar mensagem para o Discord
-                const discordMessage = {
-                    username: 'Error Logger', // Nome do bot no Discord
-                    content: `**${level.toUpperCase()}**\nTimestamp: ${timestamp}\nMessage: ${message}\n${stack ? `Stacktrace: \`\`\`${stack}\`\`\`` : ''}`
-                };
-
-                // Enviar mensagem para o Discord
-                axios.post(discordWebhookUrl, discordMessage).catch(error => {
-                    console.error('Erro ao enviar notificação para o Discord:', error);
-                });
-
-                return `${timestamp} [${level}]: ${message}`;
-            })
-        })
+        // Transporte personalizado para enviar notificações de erro ao Discord
+        new DiscordTransport()
     ],
 });
 
-app.get('/test-discord-webhook', async (req, res) => {
-    try {
-        const discordMessage = {
-            username: 'Error Logger Test', // Nome que aparecerá no Discord
-            content: `🛠️ **Teste de Webhook do Discord**\nEsta é uma mensagem de teste para verificar se o webhook do Discord está funcionando corretamente.`,
-        };
 
-        // Envia a mensagem ao Discord
-        await axios.post(discordWebhookUrl, discordMessage);
-
-        // Retorna uma resposta ao cliente
-        res.status(200).json({ success: true, message: 'Mensagem de teste enviada ao Discord com sucesso!' });
-    } catch (error) {
-        console.error('Erro ao enviar a mensagem de teste ao Discord:', error);
-        res.status(500).json({ success: false, message: 'Erro ao enviar a mensagem de teste ao Discord.' });
-    }
+app.get('/test-error', (req, res) => {
+    throw new Error('Este é um erro de teste para verificar o envio ao Discord.');
 });
 
 async function enviarDadosParaGoogleSheet(dados) {
@@ -896,6 +857,40 @@ app.post("/error404", (res, req) => {
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
+});
+
+app.use((err, req, res, next) => {
+    // Registrar o erro usando o Winston
+    logger.error({
+        message: err.message,
+        stack: err.stack,
+        url: req.originalUrl,
+        method: req.method,
+        body: req.body,
+        params: req.params,
+        query: req.query,
+    });
+
+    // Responder ao cliente com um status 500 e uma mensagem de erro genérica
+    res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error({
+        message: 'Unhandled Rejection at Promise',
+        reason: reason,
+        promise: promise,
+    });
+});
+
+process.on('uncaughtException', (error) => {
+    logger.error({
+        message: 'Uncaught Exception',
+        stack: error.stack,
+    });
+
+    // Opcional: terminar o processo para evitar um estado inconsistente
+    process.exit(1);
 });
 
 app.use((req, res, next) => {
