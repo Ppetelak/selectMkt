@@ -92,7 +92,7 @@ class DiscordTransport extends winston.transports.Console {
         if (info.level === 'error') {
             // Montar mensagem para o Discord
             const discordMessage = {
-                username: 'Error MKT Select App', // Nome do bot no Discord
+                username: 'Error MKT Select', // Nome do bot no Discord
                 content: `🚨 **ERRO DETECTADO**\n**Timestamp**: ${info.timestamp}\n**Mensagem**: ${info.message}\n${info.stack ? `**Stacktrace**: \`\`\`${info.stack}\`\`\`` : ''}`
             };
 
@@ -153,8 +153,8 @@ async function enviarDadosParaGoogleSheetSelectSalvador(dados) {
 }
 
 const emailsPorUf = {
-    AC: ["p.petelak@gmail.com"],
-    /* 'AC' => ['credenciamento13@redeselect.com.br'], */
+    /* AC: ["p.petelak@gmail.com"], */
+    AC: ['credenciamento13@redeselect.com.br'],
     AL: ["credenciamento16@redeselect.com.br"],
     AM: ["credenciamento13@redeselect.com.br"],
     AP: ["credenciamento13@redeselect.com.br"],
