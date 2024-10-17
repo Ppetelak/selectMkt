@@ -76,7 +76,7 @@ const asyncHandler = fn => (req, res, next) => {
 };
 
 const corsOptions = {
-    origin: "https://selectoperadora.com.br", // Permite todas as origens. Pode ser ajustado para um domínio específico
+    origin: "https://selectoperadora.com.br",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -115,6 +115,8 @@ app.use(
     })
 ); */
 
+const discordWebhookUrl = 'https://discord.com/api/webhooks/1296523170911879249/iiaZa4nUaKbcVLTsWW_eVfHqdrmov_1Insyo-jVAqw8A7e4adDpwfjun9mHkMt5XTS9W';
+
 const logger = winston.createLogger({
     level: "error",
     format: winston.format.combine(
@@ -125,7 +127,44 @@ const logger = winston.createLogger({
         new winston.transports.File({
             filename: path.join("erros", "error.log.json"),
         }),
+        // Transporte customizado para enviar notificações de erro ao Discord
+        new winston.transports.Console({
+            format: winston.format.printf(({ level, message, timestamp, stack }) => {
+                // Chave de Webhook do Discord (substitua pela sua URL de webhook)
+
+                // Montar mensagem para o Discord
+                const discordMessage = {
+                    username: 'Error Logger', // Nome do bot no Discord
+                    content: `**${level.toUpperCase()}**\nTimestamp: ${timestamp}\nMessage: ${message}\n${stack ? `Stacktrace: \`\`\`${stack}\`\`\`` : ''}`
+                };
+
+                // Enviar mensagem para o Discord
+                axios.post(discordWebhookUrl, discordMessage).catch(error => {
+                    console.error('Erro ao enviar notificação para o Discord:', error);
+                });
+
+                return `${timestamp} [${level}]: ${message}`;
+            })
+        })
     ],
+});
+
+app.get('/test-discord-webhook', async (req, res) => {
+    try {
+        const discordMessage = {
+            username: 'Error Logger Test', // Nome que aparecerá no Discord
+            content: `🛠️ **Teste de Webhook do Discord**\nEsta é uma mensagem de teste para verificar se o webhook do Discord está funcionando corretamente.`,
+        };
+
+        // Envia a mensagem ao Discord
+        await axios.post(discordWebhookUrl, discordMessage);
+
+        // Retorna uma resposta ao cliente
+        res.status(200).json({ success: true, message: 'Mensagem de teste enviada ao Discord com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao enviar a mensagem de teste ao Discord:', error);
+        res.status(500).json({ success: false, message: 'Erro ao enviar a mensagem de teste ao Discord.' });
+    }
 });
 
 async function enviarDadosParaGoogleSheet(dados) {
