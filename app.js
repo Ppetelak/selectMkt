@@ -36,9 +36,6 @@ app.set("view engine", "ejs");
 app.use(cookie());
 app.use(express.json());
 
-
-
-
 const asyncHandler = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
@@ -143,6 +140,30 @@ async function enviarDadosParaGoogleSheet(dados) {
 async function enviarDadosParaGoogleSheetSelectSalvador(dados) {
     const scriptURL =
         "https://script.google.com/macros/s/AKfycbywd-3xKJOAALihNMJfUpNFgikVQS9nkzbhUx4hJoYUEWmv3OdTjuFCX5gPrZB9T3Qwuw/exec";
+
+    try {
+        await axios.post(scriptURL, dados);
+        console.log("Dados enviados para o Google Sheets com sucesso.");
+    } catch (error) {
+        console.error("Erro ao enviar dados para o Google Sheets:", error);
+    }
+}
+
+async function enviarDadosParaGoogleSheetSelectBrasilia(dados) {
+    const scriptURL =
+        "https://script.google.com/macros/s/AKfycbxlGw-jeb-rVjFfY-n0YDpbCa3wC_5OQsq6I8G2mFgKAq6yqf9_efjaMjU-MPI1f7Pa/exec";
+
+    try {
+        await axios.post(scriptURL, dados);
+        console.log("Dados enviados para o Google Sheets com sucesso.");
+    } catch (error) {
+        console.error("Erro ao enviar dados para o Google Sheets:", error);
+    }
+}
+
+async function enviarDadosParaGoogleSheetSelectBH(dados) {
+    const scriptURL =
+        "https://script.google.com/macros/s/AKfycbzRuzz7T-LQACagVKC8xISNl0LNFndvIBGAwJBHhg47cMvkHVIenCnHhiMsf7KoQ3ib/exec";
 
     try {
         await axios.post(scriptURL, dados);
@@ -578,6 +599,153 @@ app.post("/submit-form-select-salvador", async (req, res) => {
         };
 
         await enviarDadosParaGoogleSheetSelectSalvador({
+            anfitriao: dadosAnfitriao,
+        });
+
+        res.status(200).json({
+            numeroConviteAnfitriao: numeroConvite,
+            tipoConvite: "Pista",
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+        });
+    } catch (err) {
+        logger.info("Erro:", err);
+        console.error("Erro:", err);
+        res.status(500).json({ message: "Erro ao inserir dados" });
+    } finally {
+        pool.end();
+    }
+});
+
+app.post("/submit-form-select-brasilia", async (req, res) => {
+    console.log("Entrando na rota");
+    const pool = await mysql.createPool(config);
+
+    try {
+        const { cpf, nomeCompleto, email, telefone, empresa } = req.body;
+
+        console.log("Dados recebidos:", req.body);
+
+        const countConvidados = await pool.query(
+            "SELECT COUNT(*) AS total FROM convidadosSelectBrasilia"
+        );
+        if (countConvidados[0].total >= 600) {
+            return res
+                .status(400)
+                .json({ message: "O número limite de convidados foi atingido." });
+        }
+
+        // Verificar se o CPF já está cadastrado
+        const cpfCheck = await pool.query(
+            "SELECT * FROM convidadosSelectBrasilia WHERE cpf = ?",
+            [cpf]
+        );
+        if (cpfCheck.length > 0) {
+            return res.status(400).json({ message: "CPF já cadastrado." });
+        }
+
+        // Gerar número de convite único para o anfitrião
+        let numeroConvite;
+        let conviteCheck;
+        do {
+            numeroConvite = `V${Math.floor(Math.random() * 90000) + 10000}`;
+            conviteCheck = await pool.query(
+                "SELECT * FROM convidadosSelectBrasilia WHERE numero_convite = ?",
+                [numeroConvite]
+            );
+        } while (conviteCheck.length > 0);
+
+        // Inserir anfitrião no banco de dados
+        await pool.query(
+            `INSERT INTO convidadosSelectBrasilia (nome_completo, cpf, numero_convite, email, empresa, telefone, data_inserido)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+            [nomeCompleto, cpf, numeroConvite, email, empresa, telefone]
+        );
+
+        const dadosAnfitriao = {
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+            email: email,
+            telefone: telefone,
+            tipoConvite: "Pista",
+            empresa: empresa,
+        };
+
+        await enviarDadosParaGoogleSheetSelectBrasilia({
+            anfitriao: dadosAnfitriao,
+        });
+
+        res.status(200).json({
+            numeroConviteAnfitriao: numeroConvite,
+            tipoConvite: "Pista",
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+        });
+    } catch (err) {
+        logger.info("Erro:", err);
+        console.error("Erro:", err);
+        res.status(500).json({ message: "Erro ao inserir dados" });
+    } finally {
+        pool.end();
+    }
+});
+
+app.post("/submit-form-select-BH", async (req, res) => {
+    console.log("Entrando na rota");
+    const pool = await mysql.createPool(config);
+
+    try {
+        const { cpf, nomeCompleto, email, telefone, empresa, nomeSupervisor } = req.body;
+
+        console.log("Dados recebidos:", req.body);
+
+        const countConvidados = await pool.query(
+            "SELECT COUNT(*) AS total FROM convidadosSelectBH"
+        );
+        if (countConvidados[0].total >= 600) {
+            return res
+                .status(400)
+                .json({ message: "O número limite de convidados foi atingido." });
+        }
+
+        // Verificar se o CPF já está cadastrado
+        const cpfCheck = await pool.query(
+            "SELECT * FROM convidadosSelectBH WHERE cpf = ?",
+            [cpf]
+        );
+        if (cpfCheck.length > 0) {
+            return res.status(400).json({ message: "CPF já cadastrado." });
+        }
+
+        // Gerar número de convite único para o anfitrião
+        let numeroConvite;
+        let conviteCheck;
+        do {
+            numeroConvite = `V${Math.floor(Math.random() * 90000) + 10000}`;
+            conviteCheck = await pool.query(
+                "SELECT * FROM convidadosSelectBH WHERE numero_convite = ?",
+                [numeroConvite]
+            );
+        } while (conviteCheck.length > 0);
+
+        // Inserir anfitrião no banco de dados
+        await pool.query(
+            `INSERT INTO convidadosSelectBH (nome_completo, cpf, numero_convite, email, empresa, telefone, nome_supervisor, data_inserido)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+            [nomeCompleto, cpf, numeroConvite, email, empresa, telefone, nomeSupervisor]
+        );
+
+        const dadosAnfitriao = {
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+            email: email,
+            telefone: telefone,
+            tipoConvite: "Pista",
+            empresa: empresa,
+            nomeSupervisor: nomeSupervisor
+        };
+
+        await enviarDadosParaGoogleSheetSelectBH({
             anfitriao: dadosAnfitriao,
         });
 
