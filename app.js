@@ -80,7 +80,7 @@ app.use(
     })
 ); */
 
-const discordWebhookUrl = 'https://discord.com/api/webhooks/1296523170911879249/iiaZa4nUaKbcVLTsWW_eVfHqdrmov_1Insyo-jVAqw8A7e4adDpwfjun9mHkMt5XTS9W';
+const discordWebhookUrl = 'https://discord.com/api/webhooks/1347263912114130954/QHGprwWDUV_L0uD7z-Hjq7GEsv5uQ6DwrtWQYZHw5eU2g6b2KVTV-8mn3u-MBrCldboM';
 
 class DiscordTransport extends winston.transports.Console {
     log(info, callback) {
@@ -89,7 +89,7 @@ class DiscordTransport extends winston.transports.Console {
         if (info.level === 'error') {
             // Montar mensagem para o Discord
             const discordMessage = {
-                username: 'Error MKT Select', // Nome do bot no Discord
+                username: 'Error MKT Select - FORM CREDENCIADOS', // Nome do bot no Discord
                 content: `🚨 **ERRO DETECTADO**\n**Timestamp**: ${info.timestamp}\n**Mensagem**: ${info.message}\n${info.stack ? `**Stacktrace**: \`\`\`${info.stack}\`\`\`` : ''}`
             };
 
@@ -163,7 +163,7 @@ async function enviarDadosParaGoogleSheetSelectBrasilia(dados) {
 
 async function enviarDadosParaGoogleSheetSelectBH(dados) {
     const scriptURL =
-        "https://script.google.com/macros/s/AKfycbzRuzz7T-LQACagVKC8xISNl0LNFndvIBGAwJBHhg47cMvkHVIenCnHhiMsf7KoQ3ib/exec";
+        "https://script.google.com/macros/s/AKfycbwRXo-L2Vf9EnpF50VtEvmpfckfLsKiAGy76Kk5Ej46nsiCK3u6AjEXpcrjSbrn-S3AWg/exec";
 
     try {
         await axios.post(scriptURL, dados);
@@ -208,12 +208,10 @@ const emailsPorUf = {
     PI: ["credenciamento16@redeselect.com.br"],
     PR: ["credenciamento14@redeselect.com.br"],
     RJ: [
-        "credenciamento15@redeselect.com.br",
-        "credenciamento12@redeselect.com.br",
-        "credenciamento17@redeselect.com.br",
-        "credenciamento21@redeselect.com.br",
-        "credenciamento19@redeselect.com.br",
-        "credenciamento20@redeselect.com.br",
+        "credenciamento35@redeselect.com.br",
+        "credenciamento41@redeselect.com.br",
+        "credenciamento46@redeselect.com.br",
+        "credenciamento45@redeselect.com.br",
     ],
     RN: ["credenciamento16@redeselect.com.br"],
     RO: ["credenciamento13@redeselect.com.br"],
@@ -222,12 +220,15 @@ const emailsPorUf = {
     SC: ["credenciamento14@redeselect.com.br"],
     SE: ["credenciamento16@redeselect.com.br"],
     SP: [
-        "credenciamento15@redeselect.com.br",
+        "credenciamento40@redeselect.com.br",
+        "credenciamento.ge@redeselect.com.br",
+        "credenciamento19@redeselect.com.br",
         "credenciamento12@redeselect.com.br",
         "credenciamento17@redeselect.com.br",
         "credenciamento21@redeselect.com.br",
-        "credenciamento19@redeselect.com.br",
-        "credenciamento20@redeselect.com.br",
+		"credenciamento20@redeselect.com.br",
+		"credenciamento39@redeselect.com.br",
+		"credenciamento47@redeselect.com.br",
     ],
     TO: ["credenciamento13@redeselect.com.br"],
 };
@@ -544,6 +545,79 @@ app.post("/submit-form", async (req, res) => {
     }
 });
 
+app.post("/submit-form-select-fortaleza", async (req, res) => {
+    console.log("Entrando na rota");
+    const pool = await mysql.createPool(config);
+
+    try {
+        const { cpf, nomeCompleto, email, telefone, empresa } = req.body;
+
+        console.log("Dados recebidos:", req.body);
+
+        const countConvidados = await pool.query(
+            "SELECT COUNT(*) AS total FROM convidadosSelectFortaleza"
+        );
+        if (countConvidados[0].total >= 852) {
+            return res
+                .status(400)
+                .json({ message: "O número limite de convidados foi atingido." });
+        }
+
+        // Verificar se o CPF já está cadastrado
+        const cpfCheck = await pool.query(
+            "SELECT * FROM convidadosSelectFortaleza WHERE cpf = ?",
+            [cpf]
+        );
+        if (cpfCheck.length > 0) {
+            return res.status(400).json({ message: "CPF já cadastrado." });
+        }
+
+        // Gerar número de convite único para o anfitrião
+        let numeroConvite;
+        let conviteCheck;
+        do {
+            numeroConvite = `V${Math.floor(Math.random() * 90000) + 10000}`;
+            conviteCheck = await pool.query(
+                "SELECT * FROM convidadosSelectFortaleza WHERE numero_convite = ?",
+                [numeroConvite]
+            );
+        } while (conviteCheck.length > 0);
+
+        // Inserir anfitrião no banco de dados
+        await pool.query(
+            `INSERT INTO convidadosSelectFortaleza (nome_completo, cpf, numero_convite, email, empresa, telefone, data_inserido)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+            [nomeCompleto, cpf, numeroConvite, email, empresa, telefone]
+        );
+
+        const dadosAnfitriao = {
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+            email: email,
+            telefone: telefone,
+            tipoConvite: "Pista",
+            empresa: empresa,
+        };
+
+        await enviarDadosParaGoogleSheetSelectSalvador({
+            anfitriao: dadosAnfitriao,
+        });
+
+        res.status(200).json({
+            numeroConviteAnfitriao: numeroConvite,
+            tipoConvite: "Pista",
+            cpf: cpf,
+            nomeCompleto: nomeCompleto,
+        });
+    } catch (err) {
+        logger.info("Erro:", err);
+        console.error("Erro:", err);
+        res.status(500).json({ message: "Erro ao inserir dados" });
+    } finally {
+        pool.end();
+    }
+});
+
 app.post("/submit-form-select-salvador", async (req, res) => {
     console.log("Entrando na rota");
     const pool = await mysql.createPool(config);
@@ -702,7 +776,7 @@ app.post("/submit-form-select-BH", async (req, res) => {
         const countConvidados = await pool.query(
             "SELECT COUNT(*) AS total FROM convidadosSelectBH"
         );
-        if (countConvidados[0].total >= 600) {
+        if (countConvidados[0].total >= 700) {
             return res
                 .status(400)
                 .json({ message: "O número limite de convidados foi atingido." });
